@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AURA'Glow — Soins Ancestraux Naturels</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Josefin+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1E1A17;--bg2:#151D16;--bg3:#201A15;--deep:#0C0A08;
+  --ink:#FBF9F6;--muted:rgba(251,249,246,.42);--faint:rgba(251,249,246,.15);
+  --gold:#C59B4B;--gold2:#E0BC7A;--border:rgba(251,249,246,.08);
+  --f-serif:'Cormorant Garamond',Georgia,serif;--f-sans:'Josefin Sans',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--f-sans);background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--gold)}
+
+/* ── TYPE ── */
+.t-label{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-family:var(--f-sans)}
+.t-body{font-size:.88rem;line-height:1.9;color:var(--muted);font-weight:300}
+
+/* ── BTN ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 32px;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;font-weight:400;border:1px solid rgba(251,249,246,.25);color:var(--ink);transition:background .3s,color .3s,border-color .3s;background:transparent}
+.btn:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn-gold{border-color:var(--gold);color:var(--gold)}
+.btn-gold:hover{background:var(--gold);color:var(--deep);border-color:var(--gold)}
+.btn-solid{background:var(--gold);border-color:var(--gold);color:var(--deep)}
+.btn-solid:hover{background:var(--gold2);border-color:var(--gold2)}
+.btn-ritual{font-family:var(--f-serif);font-style:italic;font-size:1rem;letter-spacing:.02em;text-transform:none;font-weight:300}
+
+/* ── NAV ── */
+header{position:fixed;top:0;left:0;right:0;z-index:100;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+header.scrolled{background:rgba(30,26,23,.96);backdrop-filter:blur(20px);border-color:var(--border)}
+.nav-left{display:flex;gap:36px}
+.nav-link{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);font-weight:400;transition:color .2s;text-decoration:none}
+.nav-link:hover,.nav-link.active{color:var(--ink)}
+.logo-wrap{position:absolute;left:50%;transform:translateX(-50%);text-align:center}
+.logo-link{display:flex;flex-direction:column;align-items:center;gap:7px;text-decoration:none}
+.logo-name{font-family:var(--f-serif);font-size:1.15rem;font-weight:500;letter-spacing:.12em;color:var(--gold2);line-height:1;text-transform:uppercase}
+.logo-sub{font-size:.4rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(197,155,75,.4);margin-top:0}
+/* pimg img — photo integration with gradient overlay */
+.pimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;mix-blend-mode:luminosity;opacity:.7}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-cart-btn{padding:8px;color:var(--muted);transition:color .2s;position:relative}
+.nav-cart-btn:hover{color:var(--gold)}
+.cart-n{display:none;position:absolute;top:4px;right:4px;width:14px;height:14px;background:var(--gold);color:var(--deep);border-radius:50%;font-size:.48rem;align-items:center;justify-content:center}
+.nav-mob{display:none;padding:8px;color:var(--ink)}
+#mob-menu{display:none;position:fixed;inset:0;background:var(--deep);z-index:99;flex-direction:column;justify-content:center;align-items:center;gap:36px}
+#mob-menu.open{display:flex}
+.mob-link{font-family:var(--f-serif);font-size:2.4rem;font-weight:300;color:var(--ink)}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s cubic-bezier(.25,.46,.45,.94),transform .75s cubic-bezier(.25,.46,.45,.94)}
+.reveal.visible{opacity:1;transform:none}
+.reveal[data-d="1"]{transition-delay:.1s}.reveal[data-d="2"]{transition-delay:.2s}.reveal[data-d="3"]{transition-delay:.3s}.reveal[data-d="4"]{transition-delay:.4s}
+
+/* ── IMG PLACEHOLDERS ── */
+.pimg{position:relative;overflow:hidden}
+.pimg-hint{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(251,249,246,.15);background:linear-gradient(transparent,rgba(0,0,0,.5));font-family:var(--f-sans)}
+
+/* ── TICKER ── */
+.ticker{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0;background:var(--deep)}
+.ticker-track{display:inline-flex;gap:48px;animation:tick 32s linear infinite;white-space:nowrap}
+.ticker-item{font-family:var(--f-serif);font-style:italic;font-size:1.1rem;letter-spacing:.04em;text-transform:none;color:rgba(197,155,75,.58)}
+.ticker-dot{color:var(--gold);font-size:1.15rem}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── HERO ── */
+#hero{min-height:100vh;display:grid;grid-template-columns:56% 44%;padding-top:68px}
+.hero-content{display:flex;flex-direction:column;justify-content:flex-end;padding:80px 60px 80px 48px;border-right:1px solid var(--border)}
+.hero-badge{display:inline-flex;align-items:center;gap:12px;margin-bottom:32px}
+.hero-badge::after{content:'';display:block;width:32px;height:1px;background:var(--gold);opacity:.5}
+.hero-h{font-family:var(--f-serif);font-weight:300;font-style:italic;line-height:1.05;font-size:clamp(3.2rem,5.5vw,5.4rem)}
+.hero-accent{color:var(--gold2)}
+.hero-meta{margin-top:48px;padding-top:28px;border-top:1px solid var(--border);display:flex;gap:36px}
+.hero-meta-item .val{font-family:var(--f-serif);font-size:1.8rem;font-weight:300}
+.hero-meta-item .key{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.hero-visual{position:relative;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 38% 68%, rgba(197,155,75,.22) 0%, transparent 52%),
+    radial-gradient(ellipse at 72% 28%, rgba(90,30,10,.6) 0%, transparent 45%),
+    linear-gradient(168deg, #060402 0%, #160A06 40%, #3A1608 72%, #5E2810 100%)}
+.hero-visual-label{position:absolute;bottom:28px;left:28px;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(251,249,246,.15);max-width:220px;line-height:1.6}
+.hero-scroll{position:absolute;bottom:32px;right:32px;display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(197,155,75,.3)}
+.hero-scroll span{font-size:.48rem;letter-spacing:.18em;text-transform:uppercase;writing-mode:vertical-rl}
+.hero-scroll-line{width:1px;height:40px;background:rgba(197,155,75,.3);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.2;transform:scaleY(.5)}50%{opacity:1;transform:scaleY(1)}}
+
+/* ── RITUAL TEASER ── */
+#ritual-teaser{padding:48px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:32px}
+.ritual-teaser-text h3{font-family:var(--f-serif);font-size:1.6rem;font-weight:300;font-style:italic;color:var(--ink)}
+.ritual-teaser-text p{font-size:.78rem;color:var(--muted);margin-top:6px}
+
+/* ── BOUTIQUE ── */
+#boutique{padding:100px 48px;background:var(--bg)}
+.boutique-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:64px}
+.boutique-header h2,.section-h2{font-family:var(--f-serif);font-size:clamp(2.2rem,4vw,3.4rem);font-weight:300;line-height:1.1;color:var(--ink)}
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;align-items:start}
+.product-card:nth-child(2){margin-top:80px}.product-card:nth-child(3){margin-top:40px}
+.product-card .pimg{aspect-ratio:.82;margin-bottom:22px}
+.product-num{font-family:var(--f-serif);font-size:.78rem;color:rgba(251,249,246,.15);margin-bottom:8px}
+.product-name{font-family:var(--f-serif);font-size:1.38rem;font-weight:400;color:var(--ink);margin-bottom:5px;line-height:1.25}
+.product-sub{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.product-craft{font-size:.66rem;color:rgba(197,155,75,.55);margin-top:6px;letter-spacing:.06em}
+.product-footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.product-price{font-family:var(--f-serif);font-size:1.4rem;font-weight:300}
+.btn-add{font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;padding:10px 20px;border:1px solid var(--border);color:var(--muted);background:transparent;transition:all .25s}
+.btn-add:hover{background:var(--gold);color:var(--deep);border-color:var(--gold)}
+
+/* ── HISTOIRE ── */
+#histoire{background:var(--bg2);color:var(--ink);padding:120px 48px}
+.hist-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start}
+.lettrine{font-family:var(--f-serif);font-size:1.08rem;font-weight:300;line-height:1.85;color:var(--muted)}
+.lettrine::first-letter{float:left;font-size:5.5rem;font-weight:300;line-height:.75;margin:10px 22px 0 0;color:var(--gold);font-family:var(--f-serif)}
+.hist-quote{font-family:var(--f-serif);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:300;font-style:italic;color:rgba(251,249,246,.85);line-height:1.4;margin-top:40px;padding-top:32px;border-top:1px solid rgba(197,155,75,.15)}
+.hist-visual .pimg{
+  height:560px;
+  background:
+    radial-gradient(ellipse at 42% 60%, rgba(197,155,75,.14) 0%, transparent 48%),
+    radial-gradient(ellipse at 68% 28%, rgba(80,20,8,.7) 0%, transparent 50%),
+    linear-gradient(168deg, #070402 0%, #1A0A06 42%, #4A1A08 76%, #6E2E10 100%)}
+.hist-caption{margin-top:14px;font-size:.54rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,249,246,.18)}
+.hist-values{margin-top:60px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding-top:40px;border-top:1px solid rgba(197,155,75,.12)}
+.val-item .v-num{font-family:var(--f-serif);font-size:2.8rem;font-weight:300;color:rgba(251,249,246,.9)}
+.val-item .v-key{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(251,249,246,.25)}
+
+/* ── ACTIFS ── */
+#actifs{padding:100px 48px;background:var(--bg3)}
+.actifs-inner{max-width:1200px;margin:0 auto}
+.actifs-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:72px}
+.actif-row{display:grid;grid-template-columns:80px 1fr;gap:32px;align-items:start;padding:40px 0;border-bottom:1px solid var(--border)}
+.actif-row:first-child{border-top:1px solid var(--border)}
+.actif-num{font-family:var(--f-serif);font-size:3rem;font-weight:300;color:rgba(197,155,75,.12)}
+.actif-name{font-family:var(--f-serif);font-size:1.8rem;font-weight:400;margin-bottom:4px}
+.actif-origin{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px}
+.actif-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.actif-tag{padding:5px 14px;border:1px solid var(--border);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* ── GRIMOIRE ── */
+#grimoire{padding:100px 48px;background:var(--bg)}
+.grimoire-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:64px}
+.grimoire-featured{display:grid;grid-template-columns:1.4fr 1fr;gap:64px;align-items:start;margin-bottom:64px;padding-bottom:64px;border-bottom:1px solid var(--border)}
+.grimoire-feat-img .pimg{height:480px}
+.grimoire-feat-body{padding-top:16px}
+.grimoire-feat-cat{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.grimoire-feat-title{font-family:var(--f-serif);font-size:clamp(1.8rem,3vw,2.8rem);font-weight:300;line-height:1.2;margin-bottom:18px}
+.grimoire-feat-ex{font-size:.88rem;color:var(--muted);line-height:1.85;margin-bottom:28px;font-weight:300}
+.grimoire-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.grimoire-card .pimg{aspect-ratio:1.4;margin-bottom:18px}
+.grimoire-card-cat{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.grimoire-card-title{font-family:var(--f-serif);font-size:1.25rem;font-weight:400;line-height:1.3;margin-bottom:10px}
+.grimoire-card-ex{font-size:.82rem;color:var(--muted);line-height:1.75;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-weight:300}
+.link-arr{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-top:16px;display:inline-block;border-bottom:1px solid rgba(197,155,75,.3);padding-bottom:2px;transition:border-color .2s}
+.link-arr:hover{border-color:var(--gold)}
+
+/* ── PAYMENT ── */
+#contact{background:var(--bg2);padding:72px 48px;text-align:center}
+.pay-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+.pay-pill{padding:9px 22px;border:1px solid var(--border);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+/* ── FOOTER — LIHA STYLE ── */
+footer{background:var(--deep);padding:0;overflow:hidden}
+.foot-top{display:grid;grid-template-columns:1.6fr 1fr;min-height:420px}
+.foot-editorial{padding:80px 60px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--border)}
+.foot-big{font-family:var(--f-serif);font-size:clamp(4rem,8vw,8rem);font-weight:300;font-style:italic;line-height:.9;color:var(--ink);letter-spacing:-.02em}
+.foot-big span{color:var(--gold2);display:block}
+.foot-newsletter{margin-top:auto;padding-top:48px}
+.foot-newsletter p{font-size:.82rem;color:var(--muted);margin-bottom:24px;line-height:1.7;max-width:360px}
+.news-form{display:flex;flex-direction:column;gap:0}
+.news-field{display:flex;align-items:flex-end;gap:0;border-bottom:1px solid rgba(251,249,246,.2);padding-bottom:2px}
+.news-field input{flex:1;background:transparent;border:none;outline:none;font-family:var(--f-sans);font-size:.82rem;color:var(--ink);padding:10px 0;letter-spacing:.04em}
+.news-field input::placeholder{color:rgba(251,249,246,.25)}
+.news-field button{font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);padding:10px 0 10px 20px;white-space:nowrap;transition:color .2s}
+.news-field button:hover{color:var(--gold2)}
+.news-success{display:none;font-family:var(--f-serif);font-style:italic;font-size:.92rem;color:var(--gold2);margin-top:16px;line-height:1.6}
+.foot-links{padding:60px 48px;display:flex;flex-direction:column;gap:40px}
+.foot-links-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px}
+.foot-col h4{font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(251,249,246,.18);margin-bottom:20px}
+.foot-col a{display:block;font-size:.82rem;color:rgba(251,249,246,.35);margin-bottom:14px;transition:color .2s;text-decoration:none}
+.foot-col a:hover{color:var(--ink)}
+.foot-logo-area .logo-name{font-family:var(--f-serif);font-size:1.3rem;color:var(--gold2);letter-spacing:.08em}
+.foot-logo-area p{font-size:.76rem;color:rgba(251,249,246,.25);margin-top:12px;line-height:1.8;font-weight:300}
+.foot-bottom{border-top:1px solid var(--border);padding:22px 60px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.foot-copy{font-size:.56rem;color:rgba(251,249,246,.16)}
+
+/* ── CART DRAWER ── */
+#cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;opacity:0;pointer-events:none;transition:opacity .35s;backdrop-filter:blur(6px)}
+#cart-overlay.cart-open{opacity:1;pointer-events:all}
+#cart-drawer{position:fixed;top:0;right:-500px;width:460px;max-width:100vw;height:100dvh;background:var(--bg);z-index:201;transition:right .42s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;border-left:1px solid var(--border)}
+#cart-drawer.cart-open{right:0}
+.cart-head{padding:24px 28px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.cart-title{font-family:var(--f-serif);font-size:1.4rem;font-weight:400}
+.cart-close{padding:6px;color:var(--muted);transition:color .2s}.cart-close:hover{color:var(--ink)}
+.cart-items{flex:1;overflow-y:auto;padding:20px 28px}
+.cart-item{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+.cart-item-img{width:72px;height:72px;flex-shrink:0;overflow:hidden}
+.cart-item-info{flex:1}
+.cart-item-name{font-family:var(--f-serif);font-size:1rem;margin-bottom:4px}
+.cart-item-sub{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.cart-item-row{display:flex;justify-content:space-between;align-items:center}
+.cart-item-price{font-family:var(--f-serif);font-size:1.1rem}
+.cart-remove{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:underline;transition:color .2s}.cart-remove:hover{color:var(--ink)}
+.cart-foot{padding:24px 28px;border-top:1px solid var(--border);flex-shrink:0}
+.cart-total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:22px}
+.cart-total-lbl{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.cart-total-val{font-family:var(--f-serif);font-size:2rem;font-weight:300}
+.cart-pay-info{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:12px}
+
+/* ── RITUAL MODAL ── */
+#ritual-modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.85);backdrop-filter:blur(8px)}
+#ritual-modal.open{display:flex}
+.ritual-box{background:var(--bg3);border:1px solid var(--border);padding:56px;max-width:500px;width:92%;position:relative}
+.ritual-close{position:absolute;top:20px;right:20px;padding:6px;color:var(--muted);transition:color .2s}.ritual-close:hover{color:var(--ink)}
+.ritual-step{display:none}.ritual-step.active{display:block}
+.ritual-q{font-family:var(--f-serif);font-size:1.7rem;font-weight:300;font-style:italic;line-height:1.3;margin-bottom:10px;color:var(--ink)}
+.ritual-sub{font-size:.76rem;color:var(--muted);margin-bottom:36px;line-height:1.6}
+.ritual-opts{display:flex;flex-direction:column;gap:12px}
+.ritual-opt{padding:16px 20px;border:1px solid var(--border);text-align:left;font-size:.78rem;color:var(--muted);letter-spacing:.04em;transition:all .22s;line-height:1.5}
+.ritual-opt:hover{border-color:var(--gold);color:var(--gold);background:rgba(197,155,75,.06)}
+.ritual-result{text-align:center}
+.ritual-result-img{height:160px;margin:0 auto 24px;width:160px;border-radius:0}
+.ritual-result-name{font-family:var(--f-serif);font-size:1.5rem;font-weight:400;margin-bottom:6px}
+.ritual-result-desc{font-size:.82rem;color:var(--muted);margin-bottom:28px;line-height:1.7}
+
+/* ── MIMS CHATBOT ── */
+#mims-widget{position:fixed;bottom:28px;right:28px;z-index:400;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+#mims-panel{background:var(--bg3);border:1px solid var(--border);width:308px;display:none;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+#mims-panel.open{display:flex}
+.mims-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.mims-head-info .mims-name{font-family:var(--f-serif);font-size:1rem;font-weight:400;color:var(--ink)}
+.mims-head-info .mims-role{font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.mims-close{padding:4px;color:var(--muted);transition:color .2s}.mims-close:hover{color:var(--ink)}
+.mims-msgs{height:220px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.mims-msg{max-width:85%;padding:10px 14px;font-size:.8rem;line-height:1.65;font-weight:300}
+.mims-msg.bot{background:rgba(197,155,75,.08);border-left:2px solid rgba(197,155,75,.3);color:var(--muted);align-self:flex-start}
+.mims-msg.user{background:rgba(251,249,246,.06);color:var(--muted);align-self:flex-end;text-align:right}
+.mims-input{border-top:1px solid var(--border);display:flex;align-items:center;padding:10px 14px;gap:8px}
+.mims-input input{flex:1;background:transparent;border:none;outline:none;font-size:.8rem;color:var(--ink);font-family:var(--f-sans)}
+.mims-input input::placeholder{color:rgba(251,249,246,.2)}
+.mims-send{font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding:6px;transition:color .2s}.mims-send:hover{color:var(--gold2)}
+#mims-btn{display:flex;align-items:center;gap:10px;padding:12px 22px;background:var(--deep);border:1px solid rgba(197,155,75,.35);color:var(--gold);font-family:var(--f-serif);font-style:italic;font-size:1rem;letter-spacing:.02em;transition:all .25s}
+#mims-btn:hover{background:rgba(197,155,75,.1);border-color:var(--gold)}
+.mims-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  #hero{grid-template-columns:1fr}
+  .hero-content{padding:100px 24px 56px;border-right:none;border-bottom:1px solid var(--border)}
+  .hero-visual{height:60vw}
+  .hist-inner,.grimoire-featured{grid-template-columns:1fr;gap:40px}
+  .hist-visual .pimg{height:260px}
+  .products-grid,.grimoire-grid{grid-template-columns:1fr}
+  .product-card:nth-child(2),.product-card:nth-child(3){margin-top:0}
+  .grimoire-feat-img .pimg{height:220px}
+  .foot-top{grid-template-columns:1fr}
+  .foot-editorial{padding:60px 28px}
+  .foot-links{padding:40px 28px}
+  #boutique,#actifs,#grimoire,#histoire,#contact,#ritual-teaser{padding:64px 24px}
+  header{padding:0 20px}
+  .nav-left{display:none}
+  .nav-mob{display:block}
+  .boutique-header,.actifs-top,.grimoire-header{flex-direction:column;align-items:flex-start;gap:20px}
+  .foot-bottom{padding:20px 28px}
+  #mims-widget{bottom:16px;right:16px}
+  #mims-panel{width:280px}
+}
+@media(max-width:540px){
+  .foot-links-grid{grid-template-columns:1fr}
+  .hist-values{grid-template-columns:repeat(2,1fr)}
+  .ritual-box{padding:36px 24px}
+  .foot-big{font-size:clamp(3rem,12vw,5rem)}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="site-header">
+  <nav class="nav-left">
+    <a href="#boutique" class="nav-link">Boutique</a>
+    <a href="#histoire" class="nav-link">Histoire</a>
+    <a href="#actifs" class="nav-link">Actifs</a>
+    <a href="#grimoire" class="nav-link">Le Grimoire</a>
+  </nav>
+  <div class="logo-wrap">
+    <a href="#" class="logo-link" aria-label="AURA'Glow — Accueil">
+      <svg viewBox="0 0 56 62" style="height:42px;width:auto" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="24" fill="rgba(197,155,75,.07)" stroke="#C59B4B" stroke-width="1.1"/>
+        <line x1="4.5" y1="28" x2="51.5" y2="28" stroke="#C59B4B" stroke-width=".7"/>
+        <g stroke="#C59B4B" stroke-width=".5" opacity=".5">
+          <line x1="28" y1="28" x2="28" y2="11"/>
+          <line x1="28" y1="28" x2="40.7" y2="17.2"/>
+          <line x1="28" y1="28" x2="44.4" y2="31.8"/>
+          <line x1="28" y1="28" x2="35.4" y2="43.3"/>
+          <line x1="28" y1="28" x2="20.6" y2="43.3"/>
+          <line x1="28" y1="28" x2="11.6" y2="31.8"/>
+          <line x1="28" y1="28" x2="15.3" y2="17.2"/>
+        </g>
+        <line x1="28" y1="52" x2="28" y2="56" stroke="#2E5A24" stroke-width="1.2"/>
+        <path d="M28,56 C25,51 16,45 19,38 C22,32 27.5,48 28,56 Z" fill="#2E5A24"/>
+        <path d="M28,56 C31,51 40,45 37,38 C34,32 28.5,48 28,56 Z" fill="#2E5A24"/>
+        <path d="M28,58 C22,47 20,37 23,30 C26,24 28,44 28,58 Z" fill="#1A3A12"/>
+      </svg>
+      <div class="logo-name">AURA'Glow</div>
+    </a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-cart-btn" onclick="openCart()" aria-label="Panier">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-n" id="cart-badge">0</span>
+    </button>
+    <button class="nav-mob" onclick="toggleMob()">
+      <svg id="ic-b" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <svg id="ic-x" style="display:none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<div id="mob-menu">
+  <a href="#boutique" class="mob-link" onclick="closeMob()">Boutique</a>
+  <a href="#histoire" class="mob-link" onclick="closeMob()">Histoire</a>
+  <a href="#actifs" class="mob-link" onclick="closeMob()">Actifs</a>
+  <a href="#grimoire" class="mob-link" onclick="closeMob()">Le Grimoire</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="t-label">Alchimie africaine · Fait à la main</span></div>
+    <h1 class="hero-h">Le Secret des<br><em class="hero-accent">Écorces</em> et des<br>Huiles Sacrées.</h1>
+    <p class="t-body" style="margin:20px 0 40px;max-width:380px">Préparations corps & visage transmises de lignée en lignée. Formulées pour les peaux mélaninées. Sans compromis.</p>
+    <a href="#boutique" class="btn">Découvrir les préparations</a>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><div class="val">100%</div><div class="key">Naturel</div></div>
+      <div class="hero-meta-item"><div class="val">21 j</div><div class="key">Macération</div></div>
+      <div class="hero-meta-item"><div class="val">Fait main</div><div class="key">En France</div></div>
+    </div>
+  </div>
+  <div class="hero-visual pimg" role="img" aria-label="Portrait éditorial grand format d'une femme noire aux traits sculptés, peau mélaninée profonde et lumineuse, lumière golden hour rasante sur pommettes, regard intense et souverain, grain photographique analogique — style Vogue Italia, Renell Medrano">
+    <img src="Photos Aura Glow/bansah-photography-WIgG1LJfFr0-unsplash.jpg" alt="Portrait éditorial — femme noire, lumière clair-obscur dorée" loading="lazy">
+    <div class="hero-scroll"><span>Descendre</span><div class="hero-scroll-line"></div></div>
+    <div class="hero-visual-label">Portrait éditorial · Femme noire · Golden hour · Grain analogique · Style Vogue Italia</div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">AURA'GLOW</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">ALCHIMIE AFRICAINE</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">PEAUX MÉLANINÉES</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">TRANSMIS DE LIGNÉE</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">FAIT À LA MAIN</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">SOINS ANCESTRAUX NATURELS</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">AURA'GLOW</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">ALCHIMIE AFRICAINE</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">PEAUX MÉLANINÉES</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">TRANSMIS DE LIGNÉE</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">FAIT À LA MAIN</span><span class="ticker-dot">✦</span>
+    <span class="ticker-item">SOINS ANCESTRAUX NATURELS</span><span class="ticker-dot">✦</span>
+  </div>
+</div>
+
+<!-- RITUAL TEASER -->
+<section id="ritual-teaser">
+  <div class="ritual-teaser-text">
+    <h3>Quel rituel votre lignée vous a-t-il transmis ?</h3>
+    <p>Répondez à 1 question. Nous vous guidons vers l'actif idéal pour votre peau.</p>
+  </div>
+  <button class="btn btn-gold btn-ritual" onclick="openRitual()">Trouver mon Rituel — Diagnostic ✦</button>
+</section>
+
+<!-- BOUTIQUE -->
+<section id="boutique">
+  <div class="boutique-header reveal">
+    <div>
+      <p class="t-label" style="margin-bottom:12px">✦ Les préparations</p>
+      <h2 class="section-h2">Ce que la terre<br>nous confie.</h2>
+    </div>
+    <a href="#boutique" class="btn">Tout le catalogue</a>
+  </div>
+  <div class="products-grid" id="products-grid"></div>
+</section>
+
+<!-- HISTOIRE -->
+<section id="histoire">
+  <div class="hist-inner">
+    <div class="hist-text reveal">
+      <p class="t-label" style="margin-bottom:28px">✦ Origines · Histoire</p>
+      <p class="lettrine">AURA'Glow est née dans une cuisine, pas dans un laboratoire. Née d'un geste — celui de nos grand-mères africaines, leurs ingrédients bruts et puissants, leur rapport profond à la beauté comme rituel sacré et quotidien. Pas de marketing. Pas de tendances. Des recettes qui fonctionnent parce qu'elles ont traversé le temps.</p>
+      <blockquote class="hist-quote">"Ce que ta grand-mère préparait au mortier, nous le formulons pour ta peau d'aujourd'hui."</blockquote>
+      <div class="hist-values reveal" data-d="2">
+        <div class="val-item"><div class="v-num">100%</div><div class="v-key">Naturel</div></div>
+        <div class="val-item"><div class="v-num">21j</div><div class="v-key">Macération</div></div>
+        <div class="val-item"><div class="v-num">0</div><div class="v-key">Compromis</div></div>
+      </div>
+    </div>
+    <div class="hist-visual reveal" data-d="1">
+      <div class="pimg" role="img" aria-label="Portrait mi-corps d'une femme noire aux traits puissants et sculptés, tressages géométriques serrés, tenant un mortier en pierre noire ancestral, beurre de karité brut entre ses paumes, lumière clair-obscur style Caravage, peau profondément mélaninée et texturée — photographie éditoriale noir et or">
+        <img src="Photos Aura Glow/yann-allegre-LUOCJ0hwXio-unsplash.jpg" alt="Rituel ancestral — feu de bois, chaudron, préparation nocturne" loading="lazy">
+        <div class="pimg-hint">Portrait · Femme noire · Mortier ancestral · Karité brut · Clair-obscur Caravage</div>
+      </div>
+      <p class="hist-caption">Visuel attendu : portrait éditorial noir et or · femme noire · mortier en pierre · lumière clair-obscur</p>
+    </div>
+  </div>
+</section>
+
+<!-- ACTIFS -->
+<section id="actifs">
+  <div class="actifs-inner">
+    <div class="actifs-top reveal">
+      <div>
+        <p class="t-label" style="margin-bottom:12px">✦ Les actifs</p>
+        <h2 class="section-h2">La source.</h2>
+      </div>
+      <a href="#actifs" class="btn btn-ritual">Toute la pharmacopée</a>
+    </div>
+    <div id="actifs-list"></div>
+  </div>
+</section>
+
+<!-- GRIMOIRE -->
+<section id="grimoire">
+  <div class="grimoire-header reveal">
+    <div>
+      <p class="t-label" style="margin-bottom:12px">✦ Le Grimoire</p>
+      <h2 class="section-h2">Savoirs ancestraux.</h2>
+    </div>
+    <a href="#grimoire" class="btn">Tous les articles</a>
+  </div>
+  <div class="grimoire-featured reveal">
+    <div class="grimoire-feat-img">
+      <div class="pimg" role="img" aria-label="Still life éditorial — mortier en pierre volcanique avec karité brut doré, fleurs d'hibiscus rouge sombre, poudre d'argile verte sur tissu de lin brut, fond ardoise noire texturée, lumière naturelle rasante, composition minimaliste Vogue Italia" style="height:480px;background:radial-gradient(ellipse at 40% 62%,rgba(197,155,75,.16) 0%,transparent 50%),linear-gradient(158deg,#080504 0%,#1C0A06 44%,#3E1608 78%,#5A2410 100%)">
+        <img src="Photos Aura Glow/chetan-singh-NzybkgT5q2Q-unsplash.jpg" alt="Mortier en pierre, karité brut, hibiscus rouge — still life ancestral" loading="lazy">
+        <div class="pimg-hint">Mortier en pierre · Karité brut · Hibiscus · Argile verte · Still life Vogue</div>
+      </div>
+    </div>
+    <div class="grimoire-feat-body">
+      <p class="grimoire-feat-cat">Ingrédients · 6 min</p>
+      <h2 class="grimoire-feat-title">Les secrets du Karité — ce que nos ancêtres savaient avant la science</h2>
+      <p class="grimoire-feat-ex">Avant d'être "tendance", le karité nourrissait les peaux africaines depuis des millénaires. Ce que la cosmétique occidentale a mis 50 ans à découvrir, nos grand-mères le pratiquaient chaque matin avec leurs mains et un mortier en pierre.</p>
+      <button class="btn">Lire l'article</button>
+    </div>
+  </div>
+  <div class="grimoire-grid" id="grimoire-grid"></div>
+</section>
+
+<!-- PAYMENT -->
+<section id="contact">
+  <p class="t-label" style="color:rgba(197,155,75,.5);margin-bottom:14px">Paiements acceptés</p>
+  <h2 style="font-family:var(--f-serif);font-size:clamp(1.8rem,3vw,2.6rem);font-weight:300;margin-bottom:6px">Accessible. Sans friction.</h2>
+  <p style="font-size:.82rem;color:var(--muted)">Klarna 3× sans frais disponible sur toutes les commandes.</p>
+  <div class="pay-grid">
+    <span class="pay-pill">PayPal</span><span class="pay-pill">Revolut</span>
+    <span class="pay-pill">Boursorama Bank</span><span class="pay-pill">Klarna 3×</span>
+    <span class="pay-pill">Carte bancaire</span>
+  </div>
+</section>
+
+<!-- FOOTER LIHA STYLE -->
+<footer>
+  <div class="foot-top">
+    <div class="foot-editorial">
+      <h2 class="foot-big">Rejoignez<br><span>le Grimoire.</span></h2>
+      <div class="foot-newsletter">
+        <p>Recevez nos secrets botaniques ancestraux — formules rares, rituels de saison et nouveautés en avant-première.</p>
+        <form class="news-form" onsubmit="handleNews(event)">
+          <div class="news-field">
+            <input type="email" id="news-email" placeholder="Votre adresse email" required>
+            <button type="submit">S'inscrire</button>
+          </div>
+          <p class="news-success" id="news-msg">Bienvenue dans le Grimoire. Vos secrets vous attendent dans vos prochaines lunes.</p>
+        </form>
+      </div>
+    </div>
+    <div class="foot-links">
+      <div class="foot-logo-area">
+        <div class="logo-name">AURA'Glow</div>
+        <p>Préparations corps & visage issues des traditions africaines. Faites à la main. Formulées avec amour pour les peaux mélaninées.</p>
+      </div>
+      <div class="foot-links-grid">
+        <div class="foot-col">
+          <h4>Boutique</h4>
+          <a href="#boutique">Préparations corps</a>
+          <a href="#boutique">Soins visage</a>
+          <a href="#actifs">Les actifs</a>
+        </div>
+        <div class="foot-col">
+          <h4>La marque</h4>
+          <a href="#histoire">Notre histoire</a>
+          <a href="#grimoire">Le Grimoire</a>
+          <a href="#">Livraison & retours</a>
+        </div>
+        <div class="foot-col">
+          <h4>Contact</h4>
+          <a href="mailto:contact@auraglow.fr">contact@auraglow.fr</a>
+          <a href="#">Instagram</a><a href="#">TikTok</a>
+        </div>
+        <div class="foot-col">
+          <h4>Légal</h4>
+          <a href="#">Mentions légales</a>
+          <a href="#">CGV</a>
+          <a href="#">Confidentialité</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <p class="foot-copy">© 2026 AURA'Glow. Tous droits réservés.</p>
+    <p class="foot-copy">Fait à la main · Paris, France</p>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div id="cart-overlay" onclick="closeCart()"></div>
+<div id="cart-drawer">
+  <div class="cart-head">
+    <h2 class="cart-title">Mon panier</h2>
+    <button class="cart-close" onclick="closeCart()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cart-items" id="cart-items-list"></div>
+  <div class="cart-foot">
+    <div class="cart-total-row">
+      <span class="cart-total-lbl">Sous-total</span>
+      <span class="cart-total-val" id="cart-total">0,00 €</span>
+    </div>
+    <button class="btn btn-solid" style="width:100%;justify-content:center" onclick="alert('Paiement à intégrer')">Passer la commande</button>
+    <p class="cart-pay-info">PayPal · Revolut · Klarna 3× · Boursorama</p>
+  </div>
+</div>
+
+<!-- RITUAL MODAL -->
+<div id="ritual-modal">
+  <div class="ritual-box">
+    <button class="ritual-close" onclick="closeRitual()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="ritual-step active" id="ritual-q">
+      <p class="t-label" style="margin-bottom:20px">✦ Diagnostic rituel</p>
+      <h2 class="ritual-q">Quel est l'objectif<br>principal pour votre peau ?</h2>
+      <p class="ritual-sub">Une seule réponse. Votre rituel ancestral vous attend.</p>
+      <div class="ritual-opts">
+        <button class="ritual-opt" onclick="showRitualResult('eclat')">A — Éclat & Anti-taches : raviver la lumière naturelle de ma peau</button>
+        <button class="ritual-opt" onclick="showRitualResult('nutrition')">B — Nutrition Intense : nourrir en profondeur une peau sèche ou déshydratée</button>
+        <button class="ritual-opt" onclick="showRitualResult('purete')">C — Purification : réguler, purifier, effacer les imperfections</button>
+      </div>
+    </div>
+    <div class="ritual-step" id="ritual-res">
+      <div class="ritual-result">
+        <p class="t-label" style="margin-bottom:16px">✦ Votre rituel</p>
+        <div class="ritual-result-img pimg" id="ritual-res-img" style="width:140px;height:140px"></div>
+        <h3 class="ritual-result-name" id="ritual-res-name"></h3>
+        <p class="ritual-result-desc" id="ritual-res-desc"></p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-gold" id="ritual-res-add">Ajouter au rituel</button>
+          <button class="btn" onclick="showRitualStep('q')">Recommencer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MIMS CHATBOT -->
+<div id="mims-widget">
+  <div id="mims-panel">
+    <div class="mims-head">
+      <div class="mims-head-info">
+        <div class="mims-name">Mims</div>
+        <div class="mims-role">Conseillère Rituelle</div>
+      </div>
+      <button class="mims-close" onclick="toggleMims()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mims-msgs" id="mims-msgs"></div>
+    <div class="mims-input">
+      <input type="text" id="mims-text" placeholder="Répondre à Mims…" onkeydown="if(event.key==='Enter')sendMims()">
+      <button class="mims-send" onclick="sendMims()">Envoyer</button>
+    </div>
+  </div>
+  <button id="mims-btn" onclick="toggleMims()">
+    <div class="mims-dot"></div>
+    Parler avec Mims
+  </button>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────
+const PRODUCTS = [
+  { id:"karite", num:"01", name:"Beurre de Karité Pur", sub:"Corps & Visage · 200 ml", price:28,
+    craft:"Broyé au mortier · Ghana · Non raffiné",
+    grad:"radial-gradient(ellipse at 35% 65%,rgba(200,150,60,.32) 0%,transparent 52%),linear-gradient(160deg,#0E0804 0%,#2A1208 48%,#6A3010 100%)",
+    photo:"Photos Aura Glow/tabita-princesia-M5YUW0YVgig-unsplash.jpg",
+    alt:"Femme noire versant du beurre de karité non raffiné doré sur ses mains ouvertes, fond sombre et texturé, mortier en pierre noire, lumière naturelle oblique" },
+  { id:"serum", num:"02", name:"Sérum Hibiscus", sub:"Anti-âge Visage · 30 ml", price:42,
+    craft:"Macéré à froid · 21 jours · Hibiscus sauvage",
+    grad:"radial-gradient(ellipse at 65% 35%,rgba(180,50,50,.28) 0%,transparent 48%),linear-gradient(160deg,#0E0408 0%,#3A0C16 48%,#6A1A20 100%)",
+    photo:"Photos Aura Glow/naas-nahas-dstudio-S90LSxOB1HA-unsplash.jpg",
+    alt:"Gros plan éditorial d'une joue mélaninée profondément lumineuse, pétales d'hibiscus rouge sombre posés sur la peau, flacon en verre ambré, lumière rasante or et sang" },
+  { id:"masque", num:"03", name:"Masque Argile & Neem", sub:"Purifiant Visage · 100 ml", price:24,
+    craft:"Argile verte · Neem pressé à froid · Cueilli à l'aube",
+    grad:"radial-gradient(ellipse at 40% 62%,rgba(80,130,60,.2) 0%,transparent 50%),linear-gradient(160deg,#060C08 0%,#121E0E 48%,#1E3016 100%)",
+    photo:"Photos Aura Glow/kadarius-seegars-Mxy5gokl8mE-unsplash.jpg",
+    alt:"Femme noire au teint profond appliquant un masque d'argile verte sur son visage, feuilles de neem fraîches autour d'elle, fond bois sombre texturé, lumière forêt verte" },
+  { id:"gommage", num:"04", name:"Gommage Mangue Sauvage", sub:"Exfoliant Corps · 250 ml", price:32,
+    craft:"Mangue sauvage d'Afrique de l'Ouest · Pressé à froid",
+    grad:"radial-gradient(ellipse at 55% 70%,rgba(220,140,40,.3) 0%,transparent 55%),linear-gradient(160deg,#100804 0%,#3C1A08 52%,#7A3E10 100%)",
+    alt:"Mains mélaninées malaxant un gommage doré couleur ambre dans un bol artisanal en terre cuite, mangues sauvages coupées en arrière-plan, fond bois brûlé" },
+  { id:"huile", num:"05", name:"Huile de Goyave", sub:"Éclat Anti-taches · 50 ml", price:38,
+    craft:"Première pression à froid · Goyave d'Afrique de l'Ouest",
+    grad:"radial-gradient(ellipse at 42% 55%,rgba(130,170,70,.2) 0%,transparent 48%),linear-gradient(160deg,#060A06 0%,#162010 52%,#2E4818 100%)",
+    alt:"Flacon en verre ambré couché dans des feuilles de goyave vert sombre et des tranches de fruit, fond ardoise noire, lumière verte forêt tropicale" },
+  { id:"eau", num:"06", name:"Eau Florale Hibiscus", sub:"Tonique · 100 ml", price:18,
+    craft:"Distillée à la pleine lune · Hibiscus sauvage",
+    grad:"radial-gradient(ellipse at 60% 36%,rgba(160,50,70,.25) 0%,transparent 48%),linear-gradient(160deg,#0E0408 0%,#320C14 52%,#5E1820 100%)",
+    alt:"Flacon brumisateur en verre teinté bordeaux posé sur pétales d'hibiscus frais rouge profond, fond marbre sombre velouté, lumière rose aurore" },
+];
+
+const BLOG = [
+  { cat:"Ingrédients", read:"8 min",
+    title:"L'Hibiscus : le Botox que la Terre nous offre",
+    ex:"Ses acides organiques exfolient, stimulent le collagène et effacent les taches. La science l'a prouvé. Nos ancêtres le savaient depuis toujours.",
+    grad:"radial-gradient(ellipse at 58% 42%,rgba(170,50,50,.22) 0%,transparent 48%),linear-gradient(158deg,#0C0408 0%,#34080E 46%,#5E1216 100%)",
+    photo:"Photos Aura Glow/wyxina-tresse-RI3aCfHSfOA-unsplash.jpg",
+    alt:"Composition éditoriale de fleurs d'hibiscus rouge profond fraîches sur fond de marbre noir, bol de poudre bordeaux, lumière clair-obscur dramatique" },
+  { cat:"Rituels", read:"5 min",
+    title:"Le rituel du vendredi soir — soin de grand-mère",
+    ex:"Dans de nombreuses cultures africaines, le vendredi soir était le moment du soin rituel. Un acte d'amour pour soi. On te le réapprend.",
+    grad:"radial-gradient(ellipse at 40% 62%,rgba(197,155,75,.18) 0%,transparent 50%),linear-gradient(158deg,#0A0604 0%,#221008 44%,#4A2208 100%)",
+    photo:"Photos Aura Glow/megan-o-hanlon-ZazThGoWgNA-unsplash.jpg",
+    alt:"Femme noire de dos dans un rituel beauté nocturne, bougies d'ambre allumées, bols d'huile dorée et de plantes sur bois sombre, atmosphère mystique et chaude" },
+  { cat:"Peau mélaninée", read:"7 min",
+    title:"Ta peau mélaninée n'est pas une peau difficile",
+    ex:"L'industrie cosmétique a longtemps mal cadré les peaux noires et métissées. Ta peau est riche en mélanine, dense en collagène. Elle a juste besoin des bons actifs.",
+    grad:"radial-gradient(ellipse at 36% 64%,rgba(110,60,20,.28) 0%,transparent 50%),linear-gradient(158deg,#080604 0%,#1A0E06 44%,#3C1E08 100%)",
+    photo:"Photos Aura Glow/ikshana-productions-Vu7lfKQMwRo-unsplash.jpg",
+    alt:"Portrait éditorial serré d'une femme noire aux traits sculptés, peau profondément mélaninée et lumineuse, regard souverain en contre-plongée, Vogue Africa style" },
+];
+
+const ACTIFS = [
+  { num:"01", name:"Karité", origin:"Ghana · Afrique de l'Ouest", color:"#C59B4B",
+    desc:"Broyé au mortier avant formulation, il conserve ses acides gras intacts. Riche en vitamines A, E et F — un régénérant hors pair pour les peaux mélaninées. Nos grand-mères l'appliquaient pur.",
+    craft:"Broyé au mortier · Origine tracée · Ghana · Non raffiné",
+    tags:["Hydratation 48h","Régénération","Protection naturelle","Anti-inflammatoire"] },
+  { num:"02", name:"Hibiscus", origin:"Afrique tropicale", color:"#8A2020",
+    desc:"Surnommé le \"Botox naturel\". Ses acides organiques exfolient en douceur et stimulent la production de collagène. L'acide hibiscique inhibe la mélanine — allié naturel contre les taches.",
+    craft:"Macéré à froid 21 jours · Cueilli au stade optimal",
+    tags:["Éclat du teint","Anti-taches","Anti-âge","Exfoliation douce"] },
+  { num:"03", name:"Neem", origin:"Afrique · Inde", color:"#3A5A22",
+    desc:"L'arbre sacré. Ses limonoïdes régulent le sébum sans assécher, resserrent les pores et agissent sur les bactéries à l'origine des imperfections. Sans agresser le microbiome.",
+    craft:"Pressé à froid · Concentration active maximale",
+    tags:["Purifiant","Anti-acnéique","Pores resserrés","Microbiome préservé"] },
+  { num:"04", name:"Goyave", origin:"Afrique de l'Ouest", color:"#4A6A28",
+    desc:"228 mg de vitamine C pour 100g — 4× l'orange. Cette concentration neutralise les radicaux libres responsables du vieillissement précoce et de l'hyperpigmentation.",
+    craft:"Première pression à froid · Cueilli à maturité optimale",
+    tags:["Anti-taches","Teint unifié","Vitamine C naturelle","Anti-âge"] },
+  { num:"05", name:"Konjac", origin:"Asie · Afrique", color:"#6A4020",
+    desc:"La racine purifiante. Son glucomannane exfolie sans agresser le film hydrolipidique, équilibre le pH cutané, préserve le microbiome protecteur de ta peau.",
+    craft:"Séchée naturellement · Structure fibreuse préservée",
+    tags:["Nettoyage doux","Équilibre du pH","Microbiome préservé","Peau douce"] },
+];
+
+const RITUAL_MAP = {
+  eclat:   { id:"serum",   desc:"Riche en acides organiques et hibiscus sauvage, ce sérum ravive l'éclat, atténue les taches et stimule le collagène. Le rituel anti-taches de nos aïeules." },
+  nutrition:{ id:"karite", desc:"Non raffiné, broyé au mortier au Ghana. Une seule nuit suffit à transformer une peau sèche. La préparation la plus ancestrale de la gamme." },
+  purete:  { id:"masque",  desc:"Argile verte et neem pressé à froid. Purifie en profondeur, resserre les pores, régule le sébum sans agresser votre microbiome cutané." },
+};
+
+const MIMS_BOT = {
+  init:"Je suis Mims. Quel rituel ancestral votre lignée vous a-t-il transmis ? Laissez-moi vous guider vers l'actif idéal pour votre peau.",
+  karite:["Le beurre de karité non raffiné est notre trésor fondateur. Broyé au mortier au Ghana, il conserve toute sa puissance.","Nos grand-mères l'appliquaient pur, chaque matin, avant même de se lever."],
+  serum:["Le sérum hibiscus est surnommé 'le Botox naturel' en Afrique depuis des siècles — la science l'a enfin prouvé.","Macéré à froid pendant 21 jours. Aucune chaleur. Tous les actifs préservés."],
+  peau:["Les peaux mélaninées sont denses en collagène, riches en mélanine. Elles ont juste besoin des bons actifs ancestraux.","Votre peau n'est pas difficile. Elle a simplement été trop longtemps mal formulée par une industrie qui ne la comprend pas."],
+  default:["Les secrets de la terre s'apprennent en silence et en patience. Parlez-moi de votre peau — je vous guide vers votre rituel.","Chaque peau mélaninée a son actif ancestral. Dites-moi ce que vous cherchez."],
+};
+
+// ── RENDER ──────────────────────────────────────────────────────
+function renderProducts(){
+  const el=document.getElementById("products-grid");
+  if(!el)return;
+  el.innerHTML=PRODUCTS.slice(0,3).map((p,i)=>
+    `<article class="product-card reveal" data-d="${i+1}">
+      <div class="pimg" style="aspect-ratio:.82;background:${p.grad}" role="img" aria-label="${p.alt}">
+        ${p.photo?`<img src="${p.photo}" alt="${p.alt}" loading="lazy">`:""}
+        <div class="pimg-hint">${p.alt}</div>
+      </div>
+      <p class="product-num">${p.num}</p>
+      <h3 class="product-name">${p.name}</h3>
+      <p class="product-sub">${p.sub}</p>
+      <p class="product-craft">✦ ${p.craft}</p>
+      <div class="product-footer">
+        <span class="product-price">${p.price} €</span>
+        <button class="btn-add" onclick="addToCart('${p.id}')">Ajouter au rituel</button>
+      </div>
+    </article>`
+  ).join("");observeReveal();
+}
+
+function renderActifs(){
+  const el=document.getElementById("actifs-list");
+  if(!el)return;
+  el.innerHTML=ACTIFS.map((a,i)=>
+    `<div class="actif-row reveal" data-d="${(i%3)+1}">
+      <div class="actif-num">${a.num}</div>
+      <div>
+        <h3 class="actif-name">${a.name}</h3>
+        <p class="actif-origin" style="color:${a.color}">${a.origin}</p>
+        <p class="t-body">${a.desc}</p>
+        <p style="font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(197,155,75,.5);margin:10px 0 12px">✦ ${a.craft}</p>
+        <div class="actif-tags">${a.tags.map(t=>`<span class="actif-tag">${t}</span>`).join("")}</div>
+      </div>
+    </div>`
+  ).join("");observeReveal();
+}
+
+function renderGrimoire(){
+  const el=document.getElementById("grimoire-grid");
+  if(!el)return;
+  el.innerHTML=BLOG.map((b,i)=>
+    `<article class="grimoire-card reveal" data-d="${i+1}">
+      <div class="pimg" style="aspect-ratio:1.4;background:${b.grad}" role="img" aria-label="${b.alt}">
+        ${b.photo?`<img src="${b.photo}" alt="${b.alt}" loading="lazy">`:""}
+        <div class="pimg-hint">${b.alt}</div>
+      </div>
+      <p class="grimoire-card-cat">${b.cat} · ${b.read}</p>
+      <h3 class="grimoire-card-title">${b.title}</h3>
+      <p class="grimoire-card-ex">${b.ex}</p>
+      <a href="#grimoire" class="link-arr">Lire l'article →</a>
+    </article>`
+  ).join("");observeReveal();
+}
+
+// ── CART ─────────────────────────────────────────────────────────
+let cart=[];
+function addToCart(id){
+  const p=PRODUCTS.find(x=>x.id===id);if(!p)return;
+  const ex=cart.find(x=>x.id===id);
+  if(ex)ex.qty++;else cart.push({...p,qty:1});
+  renderCart();openCart();
+}
+function removeFromCart(id){cart=cart.filter(x=>x.id!==id);renderCart();}
+function renderCart(){
+  const count=cart.reduce((s,i)=>s+i.qty,0);
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const badge=document.getElementById("cart-badge");
+  badge.textContent=count;badge.style.display=count>0?"flex":"none";
+  document.getElementById("cart-total").textContent=total.toFixed(2).replace(".",",")+" €";
+  const list=document.getElementById("cart-items-list");
+  if(!cart.length){list.innerHTML="<p style='text-align:center;color:var(--muted);font-size:.84rem;padding:52px 0;font-weight:300'>Ton panier est vide.</p>";return;}
+  list.innerHTML=cart.map(item=>
+    `<div class="cart-item">
+      <div class="cart-item-img" style="background:${item.grad}"></div>
+      <div class="cart-item-info">
+        <p class="cart-item-name">${item.name}</p>
+        <p class="cart-item-sub">${item.sub} · Qté ${item.qty}</p>
+        <div class="cart-item-row">
+          <span class="cart-item-price">${(item.price*item.qty).toFixed(2).replace(".",",")} €</span>
+          <button class="cart-remove" onclick="removeFromCart('${item.id}')">Retirer</button>
+        </div>
+      </div>
+    </div>`
+  ).join("");
+}
+function openCart(){document.getElementById("cart-drawer").classList.add("cart-open");document.getElementById("cart-overlay").classList.add("cart-open");document.body.style.overflow="hidden";}
+function closeCart(){document.getElementById("cart-drawer").classList.remove("cart-open");document.getElementById("cart-overlay").classList.remove("cart-open");document.body.style.overflow="";}
+
+// ── RITUAL MODAL ─────────────────────────────────────────────────
+function openRitual(){document.getElementById("ritual-modal").classList.add("open");showRitualStep("q");}
+function closeRitual(){document.getElementById("ritual-modal").classList.remove("open");}
+function showRitualStep(s){
+  document.querySelectorAll(".ritual-step").forEach(el=>el.classList.remove("active"));
+  document.getElementById("ritual-"+s).classList.add("active");
+}
+function showRitualResult(key){
+  const r=RITUAL_MAP[key];const p=PRODUCTS.find(x=>x.id===r.id);
+  document.getElementById("ritual-res-img").style.background=p.grad;
+  document.getElementById("ritual-res-name").textContent=p.name;
+  document.getElementById("ritual-res-desc").textContent=r.desc;
+  document.getElementById("ritual-res-add").onclick=()=>{addToCart(p.id);closeRitual();};
+  showRitualStep("res");
+}
+document.getElementById("ritual-modal").addEventListener("click",function(e){if(e.target===this)closeRitual();});
+
+// ── MIMS CHATBOT ─────────────────────────────────────────────────
+let mimsOpen=false,mimsInitialized=false;
+function toggleMims(){
+  mimsOpen=!mimsOpen;
+  document.getElementById("mims-panel").classList.toggle("open",mimsOpen);
+  if(mimsOpen&&!mimsInitialized){
+    mimsInitialized=true;
+    setTimeout(()=>appendMims("bot",MIMS_BOT.init),400);
+  }
+}
+function appendMims(role,text){
+  const box=document.getElementById("mims-msgs");
+  const el=document.createElement("div");
+  el.className="mims-msg "+role;el.textContent=text;
+  box.appendChild(el);box.scrollTop=box.scrollHeight;
+}
+function sendMims(){
+  const inp=document.getElementById("mims-text");
+  const msg=inp.value.trim();if(!msg)return;
+  appendMims("user",msg);inp.value="";
+  const low=msg.toLowerCase();
+  let replies=MIMS_BOT.default;
+  if(low.includes("karit")||low.includes("corps")||low.includes("sec"))replies=MIMS_BOT.karite;
+  else if(low.includes("serum")||low.includes("hibiscus")||low.includes("tache")||low.includes("eclat"))replies=MIMS_BOT.serum;
+  else if(low.includes("peau")||low.includes("mélanin")||low.includes("noire")||low.includes("bonne"))replies=MIMS_BOT.peau;
+  const r=replies[Math.floor(Math.random()*replies.length)];
+  setTimeout(()=>appendMims("bot",r),600);
+}
+
+// ── MOBILE MENU ──────────────────────────────────────────────────
+function toggleMob(){
+  const m=document.getElementById("mob-menu");const open=m.classList.toggle("open");
+  document.getElementById("ic-b").style.display=open?"none":"block";
+  document.getElementById("ic-x").style.display=open?"block":"none";
+  document.body.style.overflow=open?"hidden":"";
+}
+function closeMob(){
+  document.getElementById("mob-menu").classList.remove("open");
+  document.getElementById("ic-b").style.display="block";
+  document.getElementById("ic-x").style.display="none";
+  document.body.style.overflow="";
+}
+
+// ── NEWSLETTER ───────────────────────────────────────────────────
+function handleNews(e){
+  e.preventDefault();
+  document.getElementById("news-msg").style.display="block";
+  document.getElementById("news-email").value="";
+}
+
+// ── SCROLL REVEAL ────────────────────────────────────────────────
+let revObs;
+function observeReveal(){
+  if(!revObs)revObs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");revObs.unobserve(e.target);}});
+  },{threshold:.08});
+  document.querySelectorAll(".reveal:not(.visible)").forEach(el=>revObs.observe(el));
+}
+window.addEventListener("scroll",()=>{
+  document.getElementById("site-header").classList.toggle("scrolled",window.scrollY>60);
+  const sections=["hero","boutique","histoire","actifs","grimoire"];
+  const active=sections.reduce((acc,id)=>{
+    const el=document.getElementById(id);
+    if(el&&window.scrollY>=el.offsetTop-120)return id;return acc;
+  },"hero");
+  document.querySelectorAll(".nav-link").forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+active));
+},{passive:true});
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded",()=>{
+  renderProducts();renderActifs();renderGrimoire();renderCart();observeReveal();
+});
+</script>
+</body>
+</html>
